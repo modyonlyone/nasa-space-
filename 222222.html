@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ASTROKIDS 🚀</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(#05051d,#101044,#210d38);
+    color: white;
+    text-align: center;
+    overflow-x: hidden;
+}
+
+h1 { padding: 15px; color: #ffe66d; }
+
+/* INTRO */
+
+#introScreen {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: radial-gradient(circle at 20% 20%,#25256b,transparent 35%),
+                radial-gradient(circle at 80% 70%,#47166b,transparent 35%),
+                linear-gradient(135deg,#030313,#101044,#210d38);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 1s,visibility 1s;
+}
+
+#introScreen.hide {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.intro-stars {
+    position: absolute;
+    inset: 0;
+    background-image:
+        radial-gradient(white 1px,transparent 1px),
+        radial-gradient(#a5f3fc 1px,transparent 1px);
+    background-size: 55px 55px,90px 90px;
+    animation: starsMove 15s linear infinite;
+}
+
+@keyframes starsMove {
+    to { background-position: 300px 300px,-200px 200px; }
+}
+
+.intro-rocket {
+    font-size: 100px;
+    z-index: 2;
+    animation: rocketFloat 2s infinite;
+}
+
+@keyframes rocketFloat {
+    50% { transform: translateY(-25px) rotate(8deg); }
+}
+
+.intro-title {
+    z-index: 2;
+    font-size: clamp(35px,8vw,65px);
+    color: #ffe66d;
+    letter-spacing: 5px;
+    text-shadow: 0 0 15px #ffcf33,0 0 35px #a855f7;
+}
+
+.intro-subtitle {
+    z-index: 2;
+    color: #c4b5fd;
+    font-size: 18px;
+}
+
+#startMission {
+    z-index: 2;
+    margin-top: 35px;
+    padding: 17px 35px;
+    border: 2px solid #67e8f9;
+    border-radius: 50px;
+    background: linear-gradient(45deg,#7c3aed,#0891b2);
+    color: white;
+    font-size: 19px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 0 20px #00e5ff;
+}
+
+.intro-footer {
+    position: absolute;
+    bottom: 25px;
+    color: #aaa;
+    font-size: 12px;
+}
+
+/* VIDEOS (start + end) */
+
+#videoScreen, #endVideoScreen {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity .8s, visibility .8s;
+}
+
+#videoScreen.show, #endVideoScreen.show {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+#transitionVideo, #endVideo {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #000;
+}
+
+#skipVideo, #skipEndVideo {
+    position: absolute;
+    bottom: 25px;
+    right: 25px;
+    padding: 10px 22px;
+    border: 2px solid #67e8f9;
+    border-radius: 30px;
+    background: rgba(0,0,0,.55);
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* GAME MAP */
+
+.space {
+    position: relative;
+    width: min(100%,520px);
+    height: 1200px;
+    margin: auto;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 20% 20%,white 1px,transparent 2px),
+        radial-gradient(circle at 70% 30%,white 1px,transparent 2px),
+        radial-gradient(circle at 40% 60%,white 1px,transparent 2px),
+        radial-gradient(circle at 80% 80%,white 1px,transparent 2px),
+        #080827;
+}
+
+.planet {
+    position: absolute;
+    border-radius: 50%;
+    opacity: .8;
+}
+
+.planet1 {
+    width: 65px;height: 65px;
+    background: #a855f7;
+    top: 100px;right: 20px;
+}
+
+.planet2 {
+    width: 45px;height: 45px;
+    background: #ff9f43;
+    top: 550px;left: 15px;
+}
+
+.planet3 {
+    width: 75px;height: 75px;
+    background: #38bdf8;
+    bottom: 80px;right: 20px;
+}
+
+.path {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.level {
+    position: absolute;
+    width: 55px;height: 55px;
+    border-radius: 50%;
+    background: #ffcf33;
+    border: 4px solid white;
+    color: #111;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    transform: translate(-50%,-50%);
+    z-index: 2;
+}
+
+.level.active {
+    background: #00e5ff;
+    box-shadow: 0 0 20px #00e5ff;
+}
+
+.level.locked {
+    background: linear-gradient(#555,#222);
+    border-color: #888;
+    cursor: not-allowed;
+    opacity: .75;
+}
+
+.level.completed {
+    background: linear-gradient(#20d879,#087d43);
+    border-color: #aaffcc;
+}
+
+#rocket {
+    position: absolute;
+    font-size: 40px;
+    transform: translate(-50%,-50%);
+    transition: all .6s ease;
+    z-index: 3;
+    pointer-events: none;
+}
+
+/* QUIZ */
+
+#quiz {
+    display: none;
+    position: relative;
+    width: min(90%,500px);
+    min-height: 550px;
+    margin: 20px auto;
+    padding: 20px 20px 90px;
+    background: rgba(255,255,255,.1);
+    border: 2px solid #8b5cf6;
+    border-radius: 20px;
+}
+
+#questionImage {
+    width: 180px;
+    height: 150px;
+    object-fit: contain;
+    margin: 10px auto;
+}
+
+#questionText {
+    font-size: 21px;
+    margin: 20px 0;
+}
+
+.option {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 12px;
+    background: #eee;
+    color: #222;
+    font-size: 17px;
+    cursor: pointer;
+}
+
+.option:disabled { cursor: default; }
+
+#feedback {
+    min-height: 50px;
+    font-size: 18px;
+    font-weight: bold;
+    margin: 15px 0;
+}
+
+.action-buttons {
+    display: none;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+.action-buttons button {
+    padding: 13px 18px;
+    border: none;
+    border-radius: 15px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#finishLevel {
+    background: #ffbd00;
+    color: #17204d;
+}
+
+#nextLevel {
+    background: #00e5ff;
+    color: #10204b;
+}
+
+#progress {
+    color: #ffe66d;
+    font-size: 17px;
+}
+
+/* ================= FINAL TEST ================= */
+
+#finalTest {
+    display: none;
+    width: min(94%,520px);
+    margin: 20px auto;
+    padding: 20px;
+    background: rgba(255,255,255,.1);
+    border: 2px solid #00e5ff;
+    border-radius: 22px;
+}
+
+#finalTest h2 {
+    color: #ffe66d;
+}
+
+#finalRocket {
+    position: relative;
+    width: 300px;
+    max-width: 100%;
+    height: 390px;
+    margin: 15px auto;
+    background: radial-gradient(circle,#15154b,#080827);
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+#finalRocket svg {
+    width: 100%;
+    height: 100%;
+}
+
+.target {
+    position: absolute;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #ffcf33;
+    color: #111;
+    border: 3px solid white;
+    font-size: 20px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 15px #ffcf33;
+    transform: translate(-50%,-50%);
+}
+
+#target1 { top: 12%; left: 50%; }
+#target2 { top: 42%; left: 50%; }
+#target3 { top: 60%; left: 25%; }
+#target4 { top: 85%; left: 50%; }
+
+#finalProgress {
+    color: #67e8f9;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+#finalQuestion {
+    font-size: 21px;
+    margin: 15px 0;
+}
+
+.final-option {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 12px;
+    background: #eee;
+    color: #222;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.final-option:disabled { cursor: default; }
+
+#finalFeedback {
+    min-height: 45px;
+    font-size: 18px;
+    font-weight: bold;
+    margin: 12px;
+}
+
+#finalNext {
+    display: none;
+    padding: 14px 25px;
+    border: none;
+    border-radius: 14px;
+    background: #00e5ff;
+    color: #111;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#successScreen {
+    display: none;
+    padding: 25px 10px;
+}
+
+#successScreen h2 {
+    color: #ffe66d;
+    font-size: 27px;
+}
+
+#launchRocket {
+    font-size: 100px;
+    display: inline-block;
+}
+
+#launchRocket.launch {
+    animation: launch 2.5s ease-in forwards;
+}
+
+@keyframes launch {
+    0% { transform: translateY(0) scale(1); }
+    30% { transform: translateY(-20px) scale(1.1); }
+    100% { transform: translateY(-700px) scale(.5); }
+}
+
+#restartGame {
+    padding: 14px 25px;
+    border: none;
+    border-radius: 15px;
+    background: #ffcf33;
+    color: #111;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div id="introScreen">
+    <div class="intro-stars"></div>
+    <div class="intro-rocket">🚀</div>
+    <h1 class="intro-title">ASTROKIDS</h1>
+    <p class="intro-subtitle">EXPLORE THE UNIVERSE 🌌</p>
+    <button id="startMission" onclick="startAstroKids()">
+        START MISSION 🚀
+    </button>
+    <div class="intro-footer">YOUR SPACE ADVENTURE STARTS HERE</div>
+</div>
+
+<h1>🚀 ASTROKIDS 🚀</h1>
+
+<!-- START VIDEO (plays after START MISSION, before the game) -->
+<div id="videoScreen">
+    <video id="transitionVideo" src="lv_0_٢٠٢٦١١١٥١٠٤٢٠٩.mp4" preload="auto" playsinline></video>
+    <button id="skipVideo" onclick="finishTransition()">SKIP ⏭</button>
+</div>
+
+<!-- END VIDEO (plays after the final questions, before the success screen) -->
+<div id="endVideoScreen">
+    <video id="endVideo" src="AFTER%20GAME%20VIDEO.mp4" preload="auto" playsinline></video>
+    <button id="skipEndVideo" onclick="finishEndVideo()">SKIP ⏭</button>
+</div>
+
+<div class="space" id="space">
+    <div class="planet planet1"></div>
+    <div class="planet planet2"></div>
+    <div class="planet planet3"></div>
+
+    <svg class="path" viewBox="0 0 520 1200" preserveAspectRatio="none">
+        <path d="M156 1080 Q400 1020 364 972 Q100 900 182 864 Q400 780 364 756 Q100 690 182 648 Q400 570 364 540 Q100 480 182 432 Q400 360 364 324 Q100 270 182 216 Q400 150 364 108"
+        stroke="#ffffff" stroke-width="5" fill="none" stroke-dasharray="12 10"/>
+    </svg>
+
+    <button class="level" style="left:30%;top:90%;" data-level="1">1</button>
+    <button class="level locked" style="left:70%;top:81%;" data-level="2">2</button>
+    <button class="level locked" style="left:35%;top:72%;" data-level="3">3</button>
+    <button class="level locked" style="left:70%;top:63%;" data-level="4">4</button>
+    <button class="level locked" style="left:35%;top:54%;" data-level="5">5</button>
+    <button class="level locked" style="left:70%;top:45%;" data-level="6">6</button>
+    <button class="level locked" style="left:35%;top:36%;" data-level="7">7</button>
+    <button class="level locked" style="left:70%;top:27%;" data-level="8">8</button>
+    <button class="level locked" style="left:35%;top:18%;" data-level="9">9</button>
+    <button class="level locked" style="left:70%;top:9%;" data-level="10">10</button>
+
+    <div id="rocket" style="left:30%;top:90%;">🚀</div>
+</div>
+
+<section id="quiz">
+    <h2>🌟 Space Mission 🌟</h2>
+    <p id="progress"></p>
+    <img id="questionImage" src="" alt="Space question">
+    <h3 id="questionText"></h3>
+    <div id="options"></div>
+    <p id="feedback"></p>
+
+    <div class="action-buttons" id="actionButtons">
+        <button id="finishLevel" onclick="returnToLevelsPage()">Finish Level 🚀</button>
+        <button id="nextLevel" onclick="goToNextLevel()">Next Level ➡️</button>
+    </div>
+</section>
+
+<!-- FINAL ROCKET TEST -->
+
+<section id="finalTest">
+
+    <h2>🚀 FINAL ROCKET CHALLENGE 🚀</h2>
+    <p>Identify the four parts of the rocket!</p>
+
+    <p id="finalProgress">Question 1 / 4</p>
+
+    <div id="finalRocket">
+
+        <svg viewBox="0 0 300 390" xmlns="http://www.w3.org/2000/svg">
+
+            <!-- Rocket nose -->
+            <path d="M150 20
+                     C125 55 110 85 110 115
+                     L190 115
+                     C190 85 175 55 150 20Z"
+                  fill="#ffcf33" stroke="white" stroke-width="4"/>
+
+            <!-- Rocket body -->
+            <rect x="110" y="115" width="80" height="170"
+                  rx="12" fill="#e5e7eb" stroke="#ffffff" stroke-width="4"/>
+
+            <!-- Window -->
+            <circle cx="150" cy="170" r="22"
+                    fill="#38bdf8" stroke="#ffffff" stroke-width="5"/>
+
+            <!-- Fins -->
+            <path d="M110 220 L70 285 L110 270Z"
+                  fill="#a855f7" stroke="white" stroke-width="4"/>
+            <path d="M190 220 L230 285 L190 270Z"
+                  fill="#a855f7" stroke="white" stroke-width="4"/>
+
+            <!-- Engine -->
+            <path d="M125 285 L135 330 L165 330 L175 285Z"
+                  fill="#64748b" stroke="white" stroke-width="4"/>
+
+            <!-- Flame -->
+            <path d="M135 330 L150 380 L165 330Z"
+                  fill="#fb923c"/>
+        </svg>
+
+        <div class="target" id="target1">1</div>
+        <div class="target" id="target2">2</div>
+        <div class="target" id="target3">3</div>
+        <div class="target" id="target4">4</div>
+
+    </div>
+
+    <h3 id="finalQuestion">Which part is number 1?</h3>
+
+    <div id="finalOptions"></div>
+
+    <p id="finalFeedback"></p>
+
+    <button id="finalNext" onclick="nextFinalQuestion()">
+        Next Question ➡️
+    </button>
+
+    <div id="successScreen">
+        <h2>🎉 AMAZING! 🎉</h2>
+        <p>You completed your rocket!</p>
+        <div id="launchRocket">🚀</div>
+        <h2>MISSION COMPLETED!</h2>
+        <p>YOU ARE A SPACE EXPLORER!</p>
+        <button id="restartGame" onclick="restartGame()">PLAY AGAIN 🔄</button>
+    </div>
+
+</section>
+
+<script>
+
+/* INTRO + START VIDEO */
+
+let videoStarted = false;
+let videoFinished = false;
+
+function startAstroKids() {
+    if(videoStarted) return;
+    videoStarted = true;
+
+    const overlay = document.getElementById("videoScreen");
+    const video = document.getElementById("transitionVideo");
+
+    overlay.classList.add("show");
+
+    video.onended = finishTransition;
+    video.onerror = finishTransition;
+
+    video.currentTime = 0;
+    const playing = video.play();
+    if(playing && playing.catch) playing.catch(finishTransition);
+}
+
+function finishTransition() {
+    if(videoFinished) return;
+    videoFinished = true;
+
+    const overlay = document.getElementById("videoScreen");
+    const video = document.getElementById("transitionVideo");
+
+    video.pause();
+    revealGame();
+
+    overlay.classList.remove("show");
+    setTimeout(() => { overlay.style.display = "none"; },800);
+}
+
+function revealGame() {
+    const intro = document.getElementById("introScreen");
+    intro.classList.add("hide");
+
+    setTimeout(() => {
+        intro.style.display = "none";
+        window.scrollTo({top:0,behavior:"smooth"});
+    },1000);
+}
+
+/* QUESTIONS */
+
+const questions = [
+
+{
+image:"https://images.unsplash.com/photo-1517976487492-5750f3195933?w=400",
+question:"How does the rocket go up?",
+options:["A. With the fire that comes out from below","B. With balloons","C. With a fan"],
+answer:0,
+info:"The rocket moves up because hot gases come out from below it."
+},
+{
+image:"https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=400",
+question:"Why does the astronaut wear the helmet on his head?",
+options:["A. To look cool","B. To breathe in space","C. So the sun doesn't burn him"],
+answer:1,
+info:"The helmet helps the astronaut breathe and protects the head."
+},
+{
+image:"https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400",
+question:"Why is the astronaut suit white?",
+options:["A. To reflect the sun heat and not get hot","B. Because it looks nice","C. Because there is no other color"],
+answer:0,
+info:"The white suit reflects sunlight and helps protect the astronaut from heat."
+},
+{
+image:"https://images.unsplash.com/photo-1517976487492-5750f3195933?w=400",
+question:"What is inside the backpack on the astronaut's back?",
+options:["A. Oxygen to breathe","B. Toys","C. Sandwiches"],
+answer:0,
+info:"The backpack carries oxygen and other life-support equipment."
+},
+{
+image:"https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=400",
+question:"Why is the astronaut glove thick?",
+options:["A. To protect his hand from cold and heat","B. Because it looks nice","C. To hold a pen"],
+answer:0,
+info:"The gloves protect the astronaut's hands from extreme temperatures."
+},
+{
+image:"https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400",
+question:"Why are the astronaut boots special?",
+options:["A. To protect his feet and walk on the moon","B. To run fast","C. Because they look nice"],
+answer:0,
+info:"The boots protect the astronaut's feet and help with walking."
+},
+{
+image:"https://images.unsplash.com/photo-1517976487492-5750f3195933?w=400",
+question:"Why does the astronaut use the safety rope?",
+options:["A. So he doesn't fly away and stays connected","B. To play jump rope","C. To tie gifts"],
+answer:0,
+info:"The safety rope keeps the astronaut connected to the spacecraft."
+},
+{
+image:"https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=400",
+question:"What does the magnet do in space?",
+options:["A. It holds tools so they don't fly away","B. It sticks to the wall","C. It sings"],
+answer:0,
+info:"Magnets can help hold some tools in place."
+},
+{
+image:"https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400",
+question:"What do we use a telescope for?",
+options:["A. To see far stars and planets","B. To eat with it","C. To listen to songs"],
+answer:0,
+info:"A telescope helps us see faraway objects in space."
+},
+{
+image:"https://images.unsplash.com/photo-1517976487492-5750f3195933?w=400",
+question:"What does the satellite run on?",
+options:["A. Solar energy from the sun","B. Gasoline","C. Rocks"],
+answer:0,
+info:"Many satellites use solar panels to get energy from the sun."
+}
+];
+
+/* GAME VARIABLES */
+
+const levels = document.querySelectorAll(".level");
+const rocket = document.getElementById("rocket");
+const space = document.getElementById("space");
+const quiz = document.getElementById("quiz");
+const actionButtons = document.getElementById("actionButtons");
+const nextButton = document.getElementById("nextLevel");
+
+let currentQuestion = 0;
+let answered = false;
+let unlockedLevel = 1;
+
+/* LEVELS */
+
+function updateLevels() {
+    levels.forEach(level => {
+        const number = Number(level.dataset.level);
+
+        if(number > unlockedLevel) {
+            level.disabled = true;
+            level.classList.add("locked");
+        } else {
+            level.disabled = false;
+            level.classList.remove("locked");
+        }
+    });
+}
+
+function moveRocket(level) {
+    rocket.style.left = level.style.left;
+    rocket.style.top = level.style.top;
+}
+
+levels.forEach(level => {
+    level.addEventListener("click",() => {
+        const number = Number(level.dataset.level);
+        if(number > unlockedLevel) return;
+
+        currentQuestion = number - 1;
+        openQuestion();
+    });
+});
+
+function openQuestion() {
+    const level = levels[currentQuestion];
+
+    moveRocket(level);
+
+    levels.forEach(item => item.classList.remove("active"));
+    level.classList.add("active");
+
+    space.style.display = "none";
+    document.getElementById("finalTest").style.display = "none";
+    quiz.style.display = "block";
+
+    window.scrollTo({top:0,behavior:"smooth"});
+
+    showQuestion();
+}
+
+function showQuestion() {
+    answered = false;
+    actionButtons.style.display = "none";
+
+    const q = questions[currentQuestion];
+
+    document.getElementById("progress").textContent =
+        "Level " + (currentQuestion+1) + " / 10";
+
+    document.getElementById("questionImage").src = q.image;
+    document.getElementById("questionText").textContent = q.question;
+    document.getElementById("feedback").textContent = "";
+
+    const optionsDiv = document.getElementById("options");
+    optionsDiv.innerHTML = "";
+
+    q.options.forEach((option,index) => {
+        const button = document.createElement("button");
+        button.className = "option";
+        button.textContent = option;
+
+        button.addEventListener("click",() => {
+            checkAnswer(index,button);
+        });
+
+        optionsDiv.appendChild(button);
+    });
+}
+
+function checkAnswer(selected,selectedButton) {
+    if(answered) return;
+    answered = true;
+
+    const q = questions[currentQuestion];
+    const allOptions = document.querySelectorAll(".option");
+
+    allOptions.forEach(button => button.disabled = true);
+
+    const feedback = document.getElementById("feedback");
+
+    if(selected === q.answer) {
+        selectedButton.style.background = "#4ade80";
+        feedback.textContent = "🎉 Great job! Correct answer!";
+    } else {
+        selectedButton.style.background = "#f87171";
+        allOptions[q.answer].style.background = "#4ade80";
+        feedback.textContent = "❌ Not quite! " + q.info;
+    }
+
+    levels[currentQuestion].classList.add("completed");
+
+    unlockedLevel = Math.min(10,Math.max(unlockedLevel,currentQuestion+2));
+    updateLevels();
+
+    actionButtons.style.display = "flex";
+
+    nextButton.style.display =
+        currentQuestion === questions.length-1
+        ? "inline-block"
+        : "inline-block";
+
+    document.getElementById("finishLevel").style.display = "inline-block";
+}
+
+function goToNextLevel() {
+    if(!answered) return;
+
+    if(currentQuestion >= questions.length-1) {
+        startFinalTest();
+        return;
+    }
+
+    currentQuestion++;
+    openQuestion();
+}
+
+function returnToLevelsPage() {
+    quiz.style.display = "none";
+    space.style.display = "block";
+
+    updateLevels();
+
+    const level = levels[currentQuestion];
+    moveRocket(level);
+
+    levels.forEach(item => item.classList.remove("active"));
+
+    setTimeout(() => {
+        level.scrollIntoView({behavior:"smooth",block:"center"});
+    },200);
+
+    actionButtons.style.display = "none";
+}
+
+/* ================= FINAL ROCKET TEST ================= */
+
+const finalQuestions = [
+    {
+        name:"Rocket Nose",
+        options:["Rocket Engine","Rocket Nose","Rocket Fins","Rocket Body"],
+        answer:1
+    },
+    {
+        name:"Rocket Body",
+        options:["Rocket Engine","Rocket Nose","Rocket Body","Rocket Fins"],
+        answer:2
+    },
+    {
+        name:"Rocket Fins",
+        options:["Rocket Body","Rocket Engine","Rocket Fins","Rocket Nose"],
+        answer:2
+    },
+    {
+        name:"Rocket Engine",
+        options:["Rocket Nose","Rocket Fins","Rocket Body","Rocket Engine"],
+        answer:3
+    }
+];
+
+let finalIndex = 0;
+let finalAnswered = false;
+
+function startFinalTest() {
+    quiz.style.display = "none";
+    space.style.display = "none";
+
+    document.getElementById("finalTest").style.display = "block";
+    document.getElementById("successScreen").style.display = "none";
+    document.getElementById("finalRocket").style.display = "block";
+    document.getElementById("finalQuestion").style.display = "block";
+    document.getElementById("finalOptions").style.display = "block";
+    document.getElementById("finalFeedback").style.display = "block";
+    document.getElementById("finalProgress").style.display = "block";
+
+    finalIndex = 0;
+    showFinalQuestion();
+
+    window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function showFinalQuestion() {
+    finalAnswered = false;
+
+    const q = finalQuestions[finalIndex];
+
+    document.getElementById("finalProgress").textContent =
+        "Question " + (finalIndex+1) + " / 4";
+
+    document.getElementById("finalQuestion").textContent =
+        "Which part is number " + (finalIndex+1) + "?";
+
+    document.getElementById("finalFeedback").textContent = "";
+    document.getElementById("finalNext").style.display = "none";
+
+    document.querySelectorAll(".target").forEach(target => {
+        target.style.background = "#ffcf33";
+        target.style.color = "#111";
+    });
+
+    const optionsDiv = document.getElementById("finalOptions");
+    optionsDiv.innerHTML = "";
+
+    q.options.forEach((option,index) => {
+        const button = document.createElement("button");
+        button.className = "final-option";
+        button.textContent = option;
+
+        button.addEventListener("click",() => {
+            checkFinalAnswer(index,button);
+        });
+
+        optionsDiv.appendChild(button);
+    });
+}
+
+function checkFinalAnswer(selected,button) {
+    if(finalAnswered) return;
+
+    finalAnswered = true;
+
+    const q = finalQuestions[finalIndex];
+    const buttons = document.querySelectorAll(".final-option");
+    const target = document.getElementById("target"+(finalIndex+1));
+
+    buttons.forEach(b => b.disabled = true);
+
+    if(selected === q.answer) {
+        button.style.background = "#4ade80";
+        target.style.background = "#20d879";
+        target.style.color = "white";
+
+        document.getElementById("finalFeedback").textContent =
+            "🎉 Excellent! Correct answer!";
+    } else {
+        button.style.background = "#f87171";
+        buttons[q.answer].style.background = "#4ade80";
+
+        document.getElementById("finalFeedback").textContent =
+            "❌ Try to remember! The correct part is " + q.name + ".";
+    }
+
+    document.getElementById("finalNext").style.display = "inline-block";
+
+    document.getElementById("finalNext").textContent =
+        finalIndex === 3 ? "Finish Mission 🚀" : "Next Question ➡️";
+}
+
+function nextFinalQuestion() {
+    if(!finalAnswered) return;
+
+    if(finalIndex < 3) {
+        finalIndex++;
+        showFinalQuestion();
+    } else {
+        playEndVideo();
+    }
+}
+
+/* END VIDEO (after the final questions) */
+
+let endVideoFinished = true;
+
+function playEndVideo() {
+    if(!endVideoFinished) return;
+    endVideoFinished = false;
+
+    const overlay = document.getElementById("endVideoScreen");
+    const video = document.getElementById("endVideo");
+
+    overlay.classList.add("show");
+
+    video.onended = finishEndVideo;
+    video.onerror = finishEndVideo;
+
+    video.currentTime = 0;
+    const playing = video.play();
+    if(playing && playing.catch) playing.catch(finishEndVideo);
+}
+
+function finishEndVideo() {
+    if(endVideoFinished) return;
+    endVideoFinished = true;
+
+    const overlay = document.getElementById("endVideoScreen");
+    const video = document.getElementById("endVideo");
+
+    video.pause();
+    finishFinalTest();
+    overlay.classList.remove("show");
+}
+
+function finishFinalTest() {
+    document.getElementById("finalRocket").style.display = "none";
+    document.getElementById("finalProgress").style.display = "none";
+    document.getElementById("finalQuestion").style.display = "none";
+    document.getElementById("finalOptions").style.display = "none";
+    document.getElementById("finalFeedback").style.display = "none";
+    document.getElementById("finalNext").style.display = "none";
+
+    document.getElementById("successScreen").style.display = "block";
+
+    const launchRocket = document.getElementById("launchRocket");
+    launchRocket.classList.remove("launch");
+
+    void launchRocket.offsetWidth;
+
+    launchRocket.classList.add("launch");
+
+    window.scrollTo({top:0,behavior:"smooth"});
+}
+
+/* RESTART */
+
+function restartGame() {
+    currentQuestion = 0;
+    unlockedLevel = 1;
+    answered = false;
+    finalIndex = 0;
+
+    levels.forEach(level => {
+        level.classList.remove("completed","active");
+    });
+
+    updateLevels();
+
+    document.getElementById("finalTest").style.display = "none";
+    document.getElementById("successScreen").style.display = "none";
+
+    quiz.style.display = "none";
+    space.style.display = "block";
+
+    rocket.style.left = "30%";
+    rocket.style.top = "90%";
+
+    window.scrollTo({top:0,behavior:"smooth"});
+}
+
+/* START */
+
+updateLevels();
+
+</script>
+
+</body>
+</html>
